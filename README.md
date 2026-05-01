@@ -38,39 +38,91 @@ All monetary values are stored and computed as integers (Thai Baht). No floating
 ## Running the Application
 
 ### Prerequisites
-- Docker and Docker Compose installed
 
-### Start everything
+ก่อนเริ่มต้องติดตั้งสิ่งต่อไปนี้:
+
+#### 1. Docker Desktop
+Docker Desktop รวม Docker Engine + Docker Compose มาให้ในตัว
+
+- **Windows / macOS** → ดาวน์โหลดที่ https://www.docker.com/products/docker-desktop
+- **Linux (Ubuntu/Debian)**
+  ```bash
+  sudo apt-get update
+  sudo apt-get install -y docker.io docker-compose-plugin
+  sudo usermod -aG docker $USER   # ให้รัน docker โดยไม่ต้อง sudo (logout แล้ว login ใหม่)
+  ```
+
+ตรวจสอบว่าติดตั้งสำเร็จ:
+```bash
+docker --version          # Docker version 24.x.x หรือสูงกว่า
+docker compose version    # Docker Compose version v2.x.x หรือสูงกว่า
+```
+
+> **Windows users** — ต้องเปิด Docker Desktop ทิ้งไว้ก่อนรันคำสั่งด้านล่าง
+
+#### 2. Git
+ใช้สำหรับ clone โปรเจกต์
+
+- **Windows** → https://git-scm.com/download/win
+- **macOS** → `brew install git` หรือติดตั้งผ่าน Xcode Command Line Tools
+- **Linux** → `sudo apt-get install -y git`
+
+---
+
+### Step 1 — Clone โปรเจกต์
+
+```bash
+git clone https://github.com/TaLue/VendCore.git
+cd VendCore
+```
+
+### Step 2 — Build และ Start
+
 ```bash
 docker compose up --build
 ```
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8080
-- Database: localhost:5432
+ครั้งแรกจะใช้เวลาสักครู่เพราะต้อง build Rust binary และ Next.js ถ้าเห็น log ประมาณนี้แปลว่าพร้อมใช้งานแล้ว:
 
-The backend automatically runs migrations and seeds data on first start.
-
-### Stop
-```bash
-docker compose down
+```
+backend   | Listening on 0.0.0.0:8080
+frontend  | Ready on http://localhost:3000
 ```
 
-### Reset data
+### Step 3 — เปิดใช้งาน
+
+| หน้า | URL |
+|------|-----|
+| Vending Machine (ผู้ใช้) | http://localhost:3000 |
+| Admin Dashboard | http://localhost:3000/admin |
+| Backend API | http://localhost:8080 |
+
+> Database จะรันอยู่ที่ `localhost:5432` (ใช้ต่อตรงผ่าน psql ได้ถ้าต้องการ)
+
+Migration และ seed data จะรันอัตโนมัติทุกครั้งที่ backend start — ไม่ต้องทำอะไรเพิ่ม
+
+### Stop
+
 ```bash
+# หยุด แต่ยังเก็บ data ไว้
+docker compose down
+
+# หยุดแล้วลบ data ทั้งหมด (reset กลับ seed data ใหม่)
 docker compose down -v
 docker compose up --build
 ```
 
+---
+
 ## Running Unit Tests
 
 ```bash
-# Run backend unit tests (requires local Rust toolchain)
+# วิธีที่ 1 — รันผ่าน Docker (ไม่ต้องติดตั้ง Rust)
+docker compose run --rm backend cargo test
+
+# วิธีที่ 2 — รันในเครื่องโดยตรง (ต้องติดตั้ง Rust ก่อน: https://rustup.rs)
 cd backend
 cargo test
-
-# Or via Docker
-docker compose run --rm backend cargo test
 ```
 
 Unit tests cover:
