@@ -23,13 +23,16 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 const inputCls = "w-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white text-sm rounded px-2 py-1 border border-gray-300 dark:border-gray-600 focus:border-blue-400 outline-none";
 
+const ALLOWED_TYPES = ["image/png", "image/jpeg"];
+
 interface ImagePickerProps {
   preview: string | null;
   currentUrl: string | null;
   onChange: (file: File, preview: string) => void;
+  onError: (msg: string) => void;
 }
 
-function ImagePicker({ preview, currentUrl, onChange }: ImagePickerProps) {
+function ImagePicker({ preview, currentUrl, onChange, onError }: ImagePickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const displaySrc = preview ?? (currentUrl ? `${API_URL}${currentUrl}` : null);
 
@@ -52,6 +55,12 @@ function ImagePicker({ preview, currentUrl, onChange }: ImagePickerProps) {
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (!file) return;
+          if (!ALLOWED_TYPES.includes(file.type)) {
+            onError("รองรับเฉพาะไฟล์ PNG และ JPEG เท่านั้น");
+            e.target.value = "";
+            return;
+          }
+          onError("");
           const reader = new FileReader();
           reader.onload = (ev) => onChange(file, ev.target?.result as string);
           reader.readAsDataURL(file);
@@ -178,6 +187,7 @@ export default function ProductTable({ products, onRefresh }: Props) {
                     preview={addForm.imagePreview}
                     currentUrl={addForm.imageUrl}
                     onChange={(file, preview) => setAddForm({ ...addForm, imageFile: file, imagePreview: preview })}
+                    onError={setError}
                   />
                 </td>
                 <td className="py-2 pr-4">
@@ -211,6 +221,7 @@ export default function ProductTable({ products, onRefresh }: Props) {
                       preview={editForm.imagePreview}
                       currentUrl={editForm.imageUrl}
                       onChange={(file, preview) => setEditForm({ ...editForm, imageFile: file, imagePreview: preview })}
+                      onError={setError}
                     />
                   </td>
                   <td className="py-2 pr-4">
