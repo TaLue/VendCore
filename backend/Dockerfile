@@ -7,7 +7,7 @@ COPY Cargo.toml Cargo.lock* ./
 COPY src ./src
 COPY migrations ./migrations
 
-RUN cargo build --release
+RUN CARGO_BUILD_JOBS=2 cargo build --release
 
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y ca-certificates libssl3 && rm -rf /var/lib/apt/lists/*

@@ -8,7 +8,7 @@ name = "vendcore-backend"
 path = "src/main.rs"
 
 [dependencies]
-axum = { version = "0.7", features = ["macros"] }
+axum = { version = "0.7", features = ["macros", "multipart"] }
 tokio = { version = "1", features = ["full"] }
 sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json", "migrate"] }
 serde = { version = "1", features = ["derive"] }
