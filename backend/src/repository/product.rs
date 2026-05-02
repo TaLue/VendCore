@@ -23,12 +23,11 @@ pub async fn get_by_id(pool: &PgPool, id: Uuid) -> anyhow::Result<Option<Product
 }
 
 pub async fn create(pool: &PgPool, input: CreateProduct) -> anyhow::Result<Product> {
-    let icon = input.icon.unwrap_or_else(|| "🛒".to_string());
     let product = sqlx::query_as::<_, Product>(
-        "INSERT INTO products (name, icon, price, stock) VALUES ($1, $2, $3, $4) RETURNING *"
+        "INSERT INTO products (name, image_url, price, stock) VALUES ($1, $2, $3, $4) RETURNING *"
     )
     .bind(input.name)
-    .bind(icon)
+    .bind(input.image_url)
     .bind(input.price)
     .bind(input.stock)
     .fetch_one(pool)
@@ -42,7 +41,7 @@ pub async fn update(pool: &PgPool, id: Uuid, input: UpdateProduct) -> anyhow::Re
         UPDATE products
         SET
             name = COALESCE($2, name),
-            icon = COALESCE($3, icon),
+            image_url = COALESCE($3, image_url),
             price = COALESCE($4, price),
             stock = COALESCE($5, stock),
             updated_at = NOW()
@@ -52,7 +51,7 @@ pub async fn update(pool: &PgPool, id: Uuid, input: UpdateProduct) -> anyhow::Re
     )
     .bind(id)
     .bind(input.name)
-    .bind(input.icon)
+    .bind(input.image_url)
     .bind(input.price)
     .bind(input.stock)
     .fetch_optional(pool)

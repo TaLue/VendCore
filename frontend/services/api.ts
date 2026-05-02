@@ -7,7 +7,7 @@ const api = axios.create({
 export interface Product {
   id: string;
   name: string;
-  icon: string;
+  image_url: string | null;
   price: number;
   stock: number;
 }
@@ -28,8 +28,8 @@ export type PurchaseResponse =
   | { status: "SUCCESS"; change: ChangeItem[]; change_amount: number; message: string }
   | { status: "FAILED"; reason: string; message: string };
 
-export type CreateProductInput = { name: string; icon?: string; price: number; stock: number };
-export type UpdateProductInput = { name?: string; icon?: string; price?: number; stock?: number };
+export type CreateProductInput = { name: string; image_url?: string; price: number; stock: number };
+export type UpdateProductInput = { name?: string; image_url?: string; price?: number; stock?: number };
 
 export const getProducts = async (): Promise<Product[]> => {
   const { data } = await api.get("/products");
@@ -48,6 +48,15 @@ export const updateProduct = async (id: string, body: UpdateProductInput): Promi
 
 export const deleteProduct = async (id: string): Promise<void> => {
   await api.delete(`/products/${id}`);
+};
+
+export const uploadImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const { data } = await api.post("/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data.url;
 };
 
 export const getMoney = async (): Promise<MoneyDenomination[]> => {

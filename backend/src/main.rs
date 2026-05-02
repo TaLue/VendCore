@@ -24,6 +24,8 @@ async fn main() -> anyhow::Result<()> {
         .connect(&database_url)
         .await?;
 
+    tokio::fs::create_dir_all("/app/uploads").await?;
+
     tracing::info!("Running database migrations...");
     sqlx::migrate!("./migrations").run(&pool).await?;
     tracing::info!("Migrations complete");

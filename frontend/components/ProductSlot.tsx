@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { Product } from "@/services/api";
 
 interface Props {
@@ -7,9 +8,11 @@ interface Props {
   onSelect: (product: Product) => void;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
 export default function ProductSlot({ product, isSelected, onSelect }: Props) {
   const outOfStock = product.stock <= 0;
-  const icon = product.icon || "🛒";
+  const imgSrc = product.image_url ? `${API_URL}${product.image_url}` : null;
 
   return (
     <button
@@ -25,7 +28,20 @@ export default function ProductSlot({ product, isSelected, onSelect }: Props) {
         }
       `}
     >
-      <span className="text-2xl mb-1">{icon}</span>
+      <div className="w-12 h-12 mb-1 flex items-center justify-center rounded-md overflow-hidden bg-gray-100 dark:bg-gray-700">
+        {imgSrc ? (
+          <Image
+            src={imgSrc}
+            alt={product.name}
+            width={48}
+            height={48}
+            className="object-cover w-full h-full"
+            unoptimized
+          />
+        ) : (
+          <span className="text-gray-400 dark:text-gray-500 text-2xl">📦</span>
+        )}
+      </div>
       <span className="text-gray-800 dark:text-white text-xs font-medium text-center leading-tight">{product.name}</span>
       <span className="text-yellow-600 dark:text-yellow-300 text-sm font-bold mt-1">{product.price}฿</span>
       {outOfStock ? (
