@@ -182,3 +182,29 @@ Failure reasons: `INSUFFICIENT_PAYMENT`, `OUT_OF_STOCK`, `CANNOT_MAKE_CHANGE`
 - No authentication on admin panel (out of scope for challenge)
 - No WebSocket real-time stock sync between browser tabs
 - Single machine instance only (distributed sync not implemented)
+
+## Roadmap / Future Work
+
+### Image upload (PNG/JPEG) for products
+Replace the emoji icon system with real product images uploaded by admin.
+
+Available on branch [`feature/image-upload`](https://github.com/TaLue/VendCore/tree/feature/image-upload):
+
+```bash
+git checkout feature/image-upload
+docker compose up --build
+```
+
+**What's added:**
+- New `POST /upload` endpoint accepting multipart/form-data (PNG, JPEG only)
+- Static file serving at `GET /uploads/{filename}` via `tower-http::ServeDir`
+- Migration `003_icon_to_image.sql` — replaces `icon VARCHAR(10)` with `image_url VARCHAR(500)`
+- Persistent Docker volume `uploads_data` mounted at `/app/uploads`
+- Admin UI: emoji picker → drag-and-drop image picker with preview
+- Client-side file type validation (rejects non-PNG/JPEG before upload)
+- Server-side extension whitelist (defense in depth)
+- `next/image` configured for backend image domain via `next.config.js`
+
+**Why kept on a separate branch:**
+- Seeded products on this branch start without images — reviewer must upload images via admin before products display nicely. The `main` branch ships ready-to-demo with emoji icons out of the box.
+- Image upload is an additional feature beyond the SE Challenge spec (which only asks for stock management).
